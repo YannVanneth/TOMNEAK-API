@@ -1,0 +1,21 @@
+services:
+  tomneak-user-service-db:
+    container_name: tomneak-user-service-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: user-service-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5001:5432"
+    networks:
+      - tomneak-network
+
+networks:
+  tomneak-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

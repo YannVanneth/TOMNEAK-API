@@ -1,0 +1,44 @@
+services:
+  tomneak-keycloak-service-db:
+    image: postgres:16-alpine
+    container_name: tomneak-keycloak-service-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: tomneak-keycloak-service-db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "4444:5432"
+    networks:
+      - tomneak-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d tomneak-keycloak-service-db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  tomneak-keycloak-service:
+    image: quay.io/keycloak/keycloak:26.6.1
+    container_name: tomneak-keycloak-service
+    ports:
+      - '8080:8080'
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://tomneak-keycloak-service-db:5432/tomneak-keycloak-service-db
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: root
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    depends_on:
+      tomneak-keycloak-service-db:
+        condition: service_healthy
+    networks:
+      - tomneak-network
+
+networks:
+  tomneak-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
