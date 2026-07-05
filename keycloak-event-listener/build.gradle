@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.yannvanneth.tomneak'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Keycloak SPI dependencies
+    compileOnly 'org.keycloak:keycloak-core:26.6.1'
+    compileOnly 'org.keycloak:keycloak-server-spi:26.6.1'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:26.6.1'
+    
+    // Kafka client
+    implementation 'org.apache.kafka:kafka-clients:3.7.0'
+    
+    // Jackson for JSON serialization
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

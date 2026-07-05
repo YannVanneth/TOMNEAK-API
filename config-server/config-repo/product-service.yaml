@@ -1,9 +1,6 @@
-server:
-  port: 8001
-
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5001/user-service-db
+    url: jdbc:postgresql://localhost:5002/product-service-db
     username: root
     password: root
     driver-class-name: org.postgresql.Driver
@@ -14,23 +11,12 @@ spring:
         ddl-auto: none
       database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  flyway:
-    baseline-on-migrate: true
-
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/tomneak
           jwk-set-uri: http://localhost:8080/realms/tomneak/protocol/openid-connect/certs
-
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: user-service-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 eureka:
   client:
@@ -39,6 +25,5 @@ eureka:
   instance:
     prefer-ip-address: true
 
-app:
-  kafka:
-    topic: user.registration
+server:
+  port: 8002

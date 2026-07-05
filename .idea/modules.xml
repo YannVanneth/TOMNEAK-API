@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Tomneak.iml" filepath="$PROJECT_DIR$/Tomneak.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.yannvanneth.tomneak.userservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/org.yannvanneth.tomneak.userservice.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/userservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/userservice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.test.iml" />
     </modules>
   </component>
 </project>

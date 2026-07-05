@@ -17,12 +17,41 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  tomneak-kafka:
+    image: apache/kafka:3.7.0
+    container_name: tomneak-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://tomneak-kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@tomneak-kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+    networks:
+      - tomneak-network
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   tomneak-keycloak-service:
     image: quay.io/keycloak/keycloak:26.6.1
     container_name: tomneak-keycloak-service
     ports:
       - '8080:8080'
     command: start-dev
+    volumes:
+      - ./keycloak-event-listener/build/libs/keycloak-event-listener-1.0.0.jar:/opt/keycloak/providers/keycloak-event-listener.jar
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://tomneak-keycloak-service-db:5432/tomneak-keycloak-service-db
@@ -30,8 +59,12 @@ services:
       KC_DB_PASSWORD: root
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: tomneak-kafka:29092
+      KAFKA_TOPIC: user.registration
     depends_on:
       tomneak-keycloak-service-db:
+        condition: service_healthy
+      tomneak-kafka:
         condition: service_healthy
     networks:
       - tomneak-network
