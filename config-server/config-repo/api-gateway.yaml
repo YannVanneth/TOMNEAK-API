@@ -13,6 +13,11 @@ spring:
           uri: lb://product-service
           predicates:
             - Path=/api/v1/products/**, /api/v1/categories/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+
       globalcors:
         cors-configurations:
           '[/**]':

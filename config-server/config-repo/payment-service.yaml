@@ -1,0 +1,47 @@
+server:
+  port: 8004
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5004/payment-service-db
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  data:
+    jpa:
+      hibernate:
+        ddl-auto: none
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    baseline-on-migrate: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/tomneak
+          jwk-set-uri: http://localhost:8080/realms/tomneak/protocol/openid-connect/certs
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+app:
+  kafka:
+    topic: payment.events
