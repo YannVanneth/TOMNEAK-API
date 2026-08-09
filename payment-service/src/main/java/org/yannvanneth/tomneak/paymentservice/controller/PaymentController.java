@@ -5,31 +5,36 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.yannvanneth.tomneak.paymentservice.model.request.KhqrGenerateRequest;
+import org.yannvanneth.tomneak.paymentservice.model.request.KhqrVerifyRequest;
 import org.yannvanneth.tomneak.paymentservice.model.request.PaymentRequest;
 import org.yannvanneth.tomneak.paymentservice.model.response.ApiResponse;
 import org.yannvanneth.tomneak.paymentservice.model.response.ApiResponseFactory;
+import org.yannvanneth.tomneak.paymentservice.model.response.KhqrResponse;
 import org.yannvanneth.tomneak.paymentservice.model.response.PaymentResponse;
+import org.yannvanneth.tomneak.paymentservice.service.KhqrService;
 import org.yannvanneth.tomneak.paymentservice.service.PaymentService;
 
 import java.util.List;
 
 /**
- * PaymentController exposes REST API endpoints for initiating and querying payment transactions.
+ * PaymentController exposes REST API endpoints for initiating, querying, and verifying payment transactions including NBC Bakong KHQR.
  *
- * @author Yann Yanneth
+ * @author Yann Vanneth
  * @since 2026-08-09
  */
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
-@Tag(name = "Payment Management", description = "Endpoints for processing and managing payment transactions")
+@Tag(name = "Payment Management", description = "Endpoints for processing, KHQR generation/verification, and managing payment transactions")
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final KhqrService khqrService;
     private final ApiResponseFactory apiResponseFactory;
 
     /**
-     * Endpoint to initiate a payment transaction.
+     * Endpoint to initiate a standard payment transaction.
      *
      * @param request PaymentRequest payload
      * @return ApiResponse containing PaymentResponse
@@ -40,6 +45,33 @@ public class PaymentController {
     public ApiResponse<PaymentResponse> processPayment(@RequestBody PaymentRequest request) {
         PaymentResponse response = paymentService.processPayment(request);
         return apiResponseFactory.created(response, "Payment processed successfully");
+    }
+
+    /**
+     * Endpoint to generate NBC Bakong KHQR code and deep link.
+     *
+     * @param request KhqrGenerateRequest payload
+     * @return ApiResponse containing KhqrResponse
+     */
+    @PostMapping("/khqr/generate")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Generate NBC Bakong KHQR Code", description = "Generates EMVCo compliant Bakong KHQR string, MD5 hash, and deep link")
+    public ApiResponse<KhqrResponse> generateKhqr(@RequestBody KhqrGenerateRequest request) {
+        KhqrResponse response = khqrService.generateKhqr(request);
+        return apiResponseFactory.created(response, "KHQR generated successfully");
+    }
+
+    /**
+     * Endpoint to verify KHQR payment status and trigger SAGA PAYMENT_COMPLETED event via CDC Outbox.
+     *
+     * @param request KhqrVerifyRequest payload
+     * @return ApiResponse containing KhqrResponse
+     */
+    @PostMapping("/khqr/verify")
+    @Operation(summary = "Verify KHQR Payment Status", description = "Verifies KHQR payment completion and transactionally triggers SAGA CDC outbox event")
+    public ApiResponse<KhqrResponse> verifyKhqr(@RequestBody KhqrVerifyRequest request) {
+        KhqrResponse response = khqrService.verifyKhqr(request);
+        return apiResponseFactory.success(response, "KHQR payment verified successfully");
     }
 
     /**

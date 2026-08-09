@@ -11,5 +11,7 @@ public enum PaymentMethod {
     DEBIT_CARD,
     PAYPAL,
     BANK_TRANSFER,
-    CASH_ON_DELIVERY
+    CASH_ON_DELIVERY,
+    KHQR
 }
+
