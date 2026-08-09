@@ -44,6 +44,10 @@ class KhqrServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        org.springframework.test.util.ReflectionTestUtils.setField(khqrService, "bakongCheckoutUrl", "https://api-bakong.nbc.gov.kh/checkout?qr=");
+        org.springframework.test.util.ReflectionTestUtils.setField(khqrService, "defaultMerchantName", "Tomneak Store");
+        org.springframework.test.util.ReflectionTestUtils.setField(khqrService, "defaultBakongId", "tomneak_merchant@kmbl");
+
         generateRequest = KhqrGenerateRequest.builder()
                 .orderId("ORD-888")
                 .userId("USER-222")
@@ -53,6 +57,7 @@ class KhqrServiceImplTest {
                 .bakongAccountId("tomneak@kmbl")
                 .build();
     }
+
 
     @Test
     void generateKhqr_ShouldGenerateEmvCoKhqrStringMd5AndDeepLink() {

@@ -32,3 +32,8 @@ eureka:
 app:
   kafka:
     topic: payment.events
+  khqr:
+    bakong-checkout-url: https://api-bakong.nbc.gov.kh/checkout?qr=
+    default-merchant-name: Tomneak Store
+    default-bakong-id: tomneak_merchant@kmbl
+

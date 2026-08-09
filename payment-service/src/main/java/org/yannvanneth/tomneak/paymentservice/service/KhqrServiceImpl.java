@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yannvanneth.tomneak.paymentservice.exception.NotFoundException;
@@ -39,6 +40,15 @@ public class KhqrServiceImpl implements KhqrService {
     private final PaymentOutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
 
+    @Value("${app.khqr.bakong-checkout-url:https://api-bakong.nbc.gov.kh/checkout?qr=}")
+    private String bakongCheckoutUrl;
+
+    @Value("${app.khqr.default-merchant-name:Tomneak Store}")
+    private String defaultMerchantName;
+
+    @Value("${app.khqr.default-bakong-id:tomneak_merchant@kmbl}")
+    private String defaultBakongId;
+
     /**
      * Generates EMVCo compliant Bakong KHQR payload, saves PENDING Payment, and produces response.
      *
@@ -51,13 +61,14 @@ public class KhqrServiceImpl implements KhqrService {
         log.info("Generating KHQR code for orderId: {}, amount: {}, currency: {}", request.getOrderId(), request.getAmount(), request.getCurrency());
 
         String generatedPaymentId = "KHQR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String merchantName = request.getMerchantName() != null ? request.getMerchantName() : "Tomneak Store";
+        String merchantName = request.getMerchantName() != null ? request.getMerchantName() : defaultMerchantName;
+        String bakongAccountId = request.getBakongAccountId() != null ? request.getBakongAccountId() : defaultBakongId;
         String currencyCode = "KHR".equalsIgnoreCase(request.getCurrency()) ? "116" : "840"; // 840 = USD, 116 = KHR
 
         // Construct EMVCo KHQR String
-        String rawKhqr = buildEmvCoKhqrString(generatedPaymentId, request.getOrderId(), request.getAmount(), currencyCode, merchantName, request.getBakongAccountId());
+        String rawKhqr = buildEmvCoKhqrString(generatedPaymentId, request.getOrderId(), request.getAmount(), currencyCode, merchantName, bakongAccountId);
         String md5Hash = calculateMd5(rawKhqr);
-        String deepLink = "https://api-bakong.nbc.gov.kh/checkout?qr=" + URLEncoder.encode(rawKhqr, StandardCharsets.UTF_8);
+        String deepLink = bakongCheckoutUrl + URLEncoder.encode(rawKhqr, StandardCharsets.UTF_8);
 
         // Save Payment in PENDING status until customer scans and pays
         Payment payment = Payment.builder()
@@ -148,7 +159,7 @@ public class KhqrServiceImpl implements KhqrService {
      * Builds standard EMVCo KHQR String for Bakong payments.
      */
     private String buildEmvCoKhqrString(String paymentId, String orderId, BigDecimal amount, String currencyCode, String merchantName, String bakongId) {
-        String bakongAccount = bakongId != null ? bakongId : "tomneak_merchant@kmbl";
+        String bakongAccount = bakongId != null ? bakongId : defaultBakongId;
         String formattedAmount = amount != null ? amount.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString() : "0.00";
 
         StringBuilder sb = new StringBuilder();
