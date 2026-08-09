@@ -27,7 +27,6 @@ out/
 .metadata/
 
 # VS Code
-.vscode/
 
 # MacOS
 .DS_Store
@@ -40,6 +39,6 @@ logs/
 .docker/
 
 # Local configuration
-.env
-.env.local
 mise.toml
+config.bat
+node_modules
