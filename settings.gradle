@@ -1,0 +1,9 @@
+rootProject.name = 'Tomneak'
+
+include 'config-server'
+include 'eureka-server'
+include 'keycloak-event-listener'
+include 'user-service'
+include 'product-service'
+include 'api-gateway'
+include 'payment-service'

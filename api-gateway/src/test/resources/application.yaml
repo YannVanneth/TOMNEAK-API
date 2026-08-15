@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+    gateway:
+      enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/default/jwks
+
+eureka:
+  client:
+    enabled: false
