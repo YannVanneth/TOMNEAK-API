@@ -18,21 +18,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8080/default/jwks
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: user-service-test-group
-    listener:
-      auto-startup: false
-
 
 eureka:
   client:
     enabled: false
-
-app:
-  kafka:
-    topic: user.registration
-
-
-

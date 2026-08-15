@@ -21,10 +21,9 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: user-service-test-group
+      group-id: payment-service-test-group
     listener:
       auto-startup: false
-
 
 eureka:
   client:
@@ -32,7 +31,9 @@ eureka:
 
 app:
   kafka:
-    topic: user.registration
-
-
+    topic: payment.events
+  khqr:
+    bakong-checkout-url: https://api-bakong.nbc.gov.kh/checkout?qr=
+    default-merchant-name: Tomneak Store
+    default-bakong-id: tomneak_merchant@kmbl
 
